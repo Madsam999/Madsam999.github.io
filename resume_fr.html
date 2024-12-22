@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Résumé du Projet Final – Médias Participatifs en Ray Tracing</title>
+  <!-- Bootstrap 5 (CDN) -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    .bib-entry {
+      margin-bottom: 1.5rem;
+    }
+    .bib-title {
+      font-weight: bold;
+    }
+    .bib-authors {
+      font-style: italic;
+    }
+    .bib-info {
+      margin-left: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Conteneur principal Bootstrap -->
+<div class="container my-5">
+
+  <!-- Titre Principal -->
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="display-4 text-center">Résumé du Projet Final</h1>
+      <p class="text-center text-muted">Médias Participatifs en Ray Tracing</p>
+    </div>
+  </div>
+
+  <!-- Préambule -->
+  <div class="row">
+    <div class="col">
+      <p>
+        <strong>Auteur&nbsp;:</strong> Samuel Fournier<br/>
+        <strong>Numéro d'étudiant&nbsp;:</strong> 20218212<br/>
+        <strong>Cours&nbsp;:</strong> IFT 3150 - Cours Projet<br/>
+        <strong>Professeur&nbsp;:</strong> Dr. Pierre Poulin<br/>
+        <strong>Date&nbsp;:</strong> 22 décembre 2024
+      </p>
+      <p>
+        Pour la version anglaise de ce document, veuillez visiter le lien suivant&nbsp;:
+        <a href="resume_en.html">Summary of Final Project</a>
+      </p>
+      <p>
+        Pour le site web du projet, veuillez visiter le lien suivant&nbsp;:
+        <a href="index.html">Site Web du Projet</a>
+      </p>
+      <p>
+        Pour accéder au code source complet, veuillez visiter le lien suivant&nbsp;:
+        <a href="https://github.com/Madsam999/IFT3150_Cours_Projet">Dépôt GitHub</a>
+      </p>
+      <p>
+        Pour le rapport complet, veuillez visiter le lien suivant&nbsp;:
+        <a href="Rapport_final-1.pdf">Rapport Complet</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Introduction -->
+  <div class="row">
+    <div class="col">
+      <h2>1. Introduction</h2>
+      <p>
+        Ce projet s’inscrit dans le cadre du cours IFT 3150 et vise à étendre 
+        les capacités d’un <em>ray tracer</em> rudimentaire en lui ajoutant 
+        la possibilité de rendre des <strong>médias participatifs</strong>. 
+        En d’autres termes, il permet la représentation réaliste de la fumée 
+        (ou de tout autre médium volumétrique). Le travail s’appuie sur les 
+        concepts abordés durant la session d’hiver 2024, tels que 
+        l’implémentation de primitives de base (sphères, plans, triangles, etc.) 
+        et de modèles d’éclairage (par ex. Blinn-Phong).
+      </p>
+      <p>
+        Le principal défi consiste à gérer l’interaction de la lumière avec 
+        un médium qui n’est pas un objet rigide, mais plutôt un ensemble 
+        de voxels&nbsp;— chaque voxel représentant un échantillon de la 
+        densité volumétrique (ex. fumée). La difficulté réside dans la 
+        modélisation de l’absorption, de la diffusion et, potentiellement, 
+        de l’émission de la lumière au sein de ce volume.
+      </p>
+    </div>
+  </div>
+
+  <!-- Principes de base du Ray Tracing -->
+  <div class="row mt-5">
+    <div class="col">
+      <h2>2. Principes de base du Ray Tracing</h2>
+      <p>
+        Il existe une grande variété de méthodes pour le rendu de scènes 3D, 
+        comme celles que j’ai utilisées. Parmi elles, l’algorithme de 
+        <em>ray tracing</em> est un choix populaire en raison de sa capacité 
+        à produire des images réalistes.
+      </p>
+      <p>
+        Le <em>ray tracing</em> simule la propagation des rayons lumineux 
+        dans une scène 3D. Au lieu de lancer les rayons depuis la source 
+        de lumière, on les fait partir de la caméra (principe de Helmholtz). 
+        Pour chaque pixel de l’image finale, on calcule l’intersection entre 
+        le rayon et les objets dans la scène, puis on applique un modèle 
+        d’éclairage pour déterminer la couleur visible. Dans ce projet, 
+        le modèle d’éclairage utilisé est principalement Blinn-Phong.
+      </p>
+      <p>
+        L’algorithme de base se déroule comme suit&nbsp;:
+      </p>
+      <ol>
+        <li>Lancer un rayon depuis la caméra pour chaque pixel.</li>
+        <li>Vérifier les intersections avec les objets (triangles, sphères, etc.).</li>
+        <li>Calculer la couleur au point d’intersection en utilisant 
+          le modèle Blinn-Phong ou une approche équivalente.</li>
+        <li>Gérer la réflexion et la réfraction en fonction d’une profondeur 
+          de rayon maximale (<code>ray_depth</code>).
+          <ol>
+            <li>Pour la réflexion, lancer un nouveau rayon dans la direction 
+              réfléchie.</li>
+            <li>Pour la réfraction, lancer un nouveau rayon dans la direction 
+              réfractée (par ex. en utilisant la loi de Snell).</li>
+          </ol>
+        </li>
+      </ol>
+      <p>
+        Dans ce projet, l’extension principale consiste à gérer un 
+        <em>média participatif</em> le long du chemin du rayon, afin 
+        d’évaluer l’absorption et la diffusion dans ce volume.
+      </p>
+    </div>
+  </div>
+
+  <!-- Médias participatifs -->
+  <div class="row mt-5">
+    <div class="col">
+      <h2>3. Médias Participatifs</h2>
+      <p>
+        Le média participatif implémenté ici peut être considéré comme de 
+        la fumée, représentée dans un cube subdivisé en une grille de 
+        <strong>voxels</strong>. Chaque voxel possède une densité pouvant 
+        être générée de différentes manières&nbsp;: densité constante, 
+        gradient linéaire ou exponentiel, bruit de Perlin, etc. Selon la 
+        valeur de la densité, la quantité de lumière qui le traverse 
+        est plus ou moins atténuée.
+      </p>
+
+      <h4>3.1 Intersection Cube-Rayon</h4>
+      <p>
+        Pour déterminer si un rayon pénètre (et où) dans le volume, on calcule 
+        son intersection avec les faces du cube 
+        (<code>x=0</code>, <code>x=1</code>, <code>y=0</code>, <code>y=1</code>, 
+        <code>z=0</code>, <code>z=1</code>). Les valeurs du paramètre <code>t</code> 
+        correspondant à ces faces nous permettent d’identifier le 
+        <em>point d’entrée</em> (<code>tMin</code>) et le 
+        <em>point de sortie</em> (<code>tMax</code>) du rayon dans le cube.
+      </p>
+      <p>
+        Dans certains cas, nous pouvons rencontrer des situations particulières&nbsp;:
+      </p>
+      <ul>
+        <li>
+          <strong>Origine du rayon à l’intérieur du volume</strong>&nbsp;: 
+          dans ce scénario, il n’y a pas de point d’entrée 
+          (ou <code>tMin</code> est négatif). Nous commençons donc 
+          directement dans le volume.
+        </li>
+        <li>
+          <strong>Composante de direction nulle</strong>&nbsp;: 
+          division par zéro. En C++, la division par zéro aboutit 
+          à la valeur <em>infinity</em>, ce qui nous permet de 
+          gérer ce cas. Néanmoins, à cause de la représentation 
+          des nombres à virgule flottante, il est possible d’obtenir 
+          la valeur <code>-0.0</code>. Bien que traitée comme 0, 
+          la division par <code>-0.0</code> ne donne pas le même 
+          résultat qu’une division par <code>0.0</code> en raison 
+          du signe négatif.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Parcours du média participatif -->
+  <div class="row mt-5">
+    <div class="col">
+      <h2>4. Parcours du Média Participatif</h2>
+      <p>
+        Une fois le volume intercepté, nous devons l’échantillonner 
+        pour calculer l’absorption et la diffusion. Pour ce faire, 
+        nous devons traverser la grille. Deux approches ont été implémentées&nbsp;:
+      </p>
+      <ul>
+        <li>
+          <strong>DDA (Digital Differential Analyzer)</strong><br/>
+          Cette méthode parcourt le volume en se déplaçant d’une intersection 
+          de plan de voxel à la suivante. Elle garantit qu’aucun voxel 
+          traversé par le rayon n’est ignoré, même si le rayon frôle 
+          un coin du voxel. Cependant, cela signifie également que nous 
+          n’échantillonnerons chaque voxel qu’une seule fois.
+        </li>
+        <li>
+          <strong>Ray Marching</strong><br/>
+          Ici, on avance à l’aide d’une <em>taille de pas constante</em>. 
+          Les échantillons sont ainsi régulièrement espacés le long du rayon, 
+          parfois avec un léger <em>jitter</em> pour limiter la répétition 
+          d’artefacts. Contrairement à l’approche DDA, avec un pas suffisamment 
+          petit, il est possible d’échantillonner plusieurs fois le même voxel. 
+          Toutefois, cette méthode peut être plus lente (surtout si le pas 
+          est très petit) et ne garantit pas d’échantillonner chacun des voxels 
+          traversés par le rayon.
+        </li>
+      </ul>
+      <p>
+        Dans les deux cas, à chaque échantillon (ou pas), on détermine 
+        la densité et on modélise l’interaction avec la lumière.
+      </p>
+    </div>
+  </div>
+
+  <!-- Atténuation de la lumière -->
+  <div class="row mt-5">
+    <div class="col">
+      <h2>5. Atténuation de la Lumière</h2>
+      <p>
+        L’atténuation de la lumière dans un médium se base principalement 
+        sur la <strong>loi de Beer-Lambert</strong>&nbsp;: 
+        </p>
+        <div class="text-center">
+            <code>T = exp(-d · σ · density)</code>
+        </div>
+        <p>
+        Pour rendre les résultats plus réalistes, nous devons prendre en compte:
+        </p>
+      <ul>
+        <li>
+          <strong>Absorption</strong> (<code>σ<sub>a</sub></code>)&nbsp;: 
+          une partie de la lumière est absorbée et transformée 
+          (par ex. en chaleur).
+        </li>
+        <li>
+          <strong>Diffusion sortante</strong> (<code>σ<sub>s</sub></code>)&nbsp;: 
+          la lumière est déviée hors de la direction originale.
+        </li>
+        <li>
+          <strong>Diffusion entrante</strong> (<code>σ<sub>s</sub></code>)&nbsp;: 
+          la lumière en provenance d’autres directions est déviée 
+          vers la caméra.
+        </li>
+        <li>
+          <strong>Émission</strong>&nbsp;: non implémentée ici (par ex. feu, flammes), 
+          mais pourrait être ajoutée ultérieurement.
+        </li>
+      </ul>
+      <p>
+        La formule d’atténuation devient donc 
+        <code>T = exp(-d · (σ<sub>a</sub> + σ<sub>s</sub>) · density)</code>, 
+        où <code>density</code> est la densité volumétrique au point échantillonné. 
+        Une <em>fonction de phase</em> est utilisée pour modéliser 
+        la direction de la diffusion. Le type le plus simple est 
+        la fonction de phase isotrope, qui répartit la lumière 
+        uniformément dans toutes les directions. Sa formule est&nbsp;:
+      </p>
+      <div class="text-center">
+        <code>p<sub>iso</sub> = 1 / (4π)</code>
+      </div>
+      <p>
+        où <code>p<sub>iso</sub></code> représente la probabilité 
+        de diffusion dans une direction donnée.
+      </p>
+      <p>
+        L’autre catégorie de fonctions de phase est constituée 
+        des fonctions anisotropes, qui favorisent une direction 
+        particulière. La fonction utilisée dans ce projet est 
+        la fonction de phase de Henyey-Greenstein, définie par&nbsp;:
+      </p>
+      <div class="text-center">
+        <code>p<sub>hg</sub> = (1 - g<sup>2</sup>) / (4π(1 + g<sup>2</sup> - 2gcosθ)<sup>3/2</sup>)</code>
+      </div>
+      <p>
+        où <code>p<sub>hg</sub></code> est la probabilité de diffusion 
+        dans une direction donnée, <code>g</code> est le facteur 
+        d’asymétrie (compris entre <code>-1</code> et <code>1</code>), 
+        et <code>θ</code> est l’angle entre le rayon caméra et le rayon lumineux.
+      </p>
+
+      <h4>5.1 Calcul de la Lumière à l’Intérieur du Volume</h4>
+      <p>
+        À chaque étape le long du rayon, nous devons évaluer la quantité 
+        de lumière en provenance des différentes sources. Pour cela, 
+        nous lançons un rayon en direction de chaque lumière et calculons 
+        la transmittance (<code>lightTransmittance</code>) au point considéré. 
+        Nous appliquons ensuite la fonction de phase pour déterminer 
+        la fraction de cette lumière redirigée vers la caméra.
+      </p>
+      <p>
+        La <strong>Russian Roulette</strong> peut être employée afin 
+        d’interrompre le calcul lorsque la transmittance devient 
+        très faible, évitant ainsi de gaspiller du temps de calcul 
+        dans des zones presque opaques. Si le test aléatoire échoue, 
+        on multiplie la transmittance résiduelle pour compenser 
+        et on poursuit le calcul.
+      </p>
+    </div>
+  </div>
+
+  <!-- Shade -->
+  <div class="row mt-5">
+    <div class="col">
+      <h2>6. Fonction <code>shade()</code></h2>
+      <p>
+        Auparavant, la fonction <code>shade()</code> gérait l’éclairage 
+        de façon binaire (un objet bloquait la lumière ou non). Avec 
+        le média participatif, nous <em>pondérons</em> désormais 
+        la contribution lumineuse en fonction de la transmittance 
+        mesurée le long du rayon d’ombre dans le volume. Ainsi, 
+        la contribution de la source lumineuse peut aller de 0 à 1, 
+        traduisant une absorption partielle dans le médium.
+      </p>
+      <p>
+        Une fois que nous avons calculé l'ombrage au point d'intersection, la couleur finale du pixel est:
+      </p>
+        <div class="text-center">
+            <code>color = shade() * transmittance + scatteringColor</code>
+        </div>
+    </div>
+  </div>
+
+  <!-- Conclusion -->
+  <div class="row mt-5">
+    <div class="col">
+      <h2>7. Conclusion</h2>
+      <p>
+        Ce projet offre une compréhension plus approfondie des 
+        concepts de <em>volume rendering</em> appliqués au 
+        <em>ray tracing</em>. L’implémentation traite de l’absorption, 
+        de la diffusion sortante, de la diffusion entrante et 
+        des fonctions de phase (dont Henyey-Greenstein). Elle 
+        repose sur l’approche DDA ou Ray Marching pour parcourir 
+        le volume.
+      </p>
+      <p>
+        Parmi les améliorations possibles, on peut envisager 
+        l’ajout de l’émission (ex. feu) et le portage du code 
+        vers un <em>shader language</em> pour un rendu en temps 
+        réel sur le GPU (via OpenGL, Vulkan ou compute shaders 
+        dans Unity). On pourrait également implémenter d’autres 
+        types de fluides (eau, brouillard, etc.) en utilisant 
+        la même logique d’échantillonnage de volume.
+      </p>
+      <p>
+        Les résultats (images statiques) montrent que la simulation 
+        de la fumée, de la brume ou des nuages est convaincante, 
+        démontrant l’efficacité des méthodes mises en place 
+        pour rendre la diffusion de la lumière au sein d’un médium.
+      </p>
+    </div>
+  </div>
+
+  <!-- Images -->
+    <div class="row mt-5">
+        <div class="col">
+        <h2>8. Images</h2>
+        <p>
+            Voici quelques exemples d’images générées par le programme&nbsp;:
+        </p>
+        <!-- Images -->
+    <div class="row mt-5">
+        <div class="col">
+        <h2>8. Images</h2>
+        <p>
+            Voici quelques exemples d’images générées par le programme&nbsp;:
+        </p>
+        <div class="row">
+            <div class="col">
+            <img
+            src="images/dens_unif1.png"
+            class="img-fluid"
+            alt="Grille de voxels avec densité uniforme de 1"
+            />
+            <p class="text-center">Grille de voxels avec densité uniforme de 1.</p>
+            </div>
+            <div class="col">
+            <img
+            src="images/sphere_unif05.png"
+            class="img-fluid"
+            alt="Scène 2"
+            />
+            <p class="text-center">Sphère avec densité uniforme de 0.5.</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+            <img
+            src="images/perlin_grid(1).png"
+            class="img-fluid"
+            alt="Scène 3"
+            />
+            <p class="text-center">Grille avec densités de Perlin.</p>
+            </div>
+            <div class="col">
+            <img
+            src="images/perlin_sphere(1).png"
+            class="img-fluid"
+            alt="Scène 4"
+            />
+            <p class="text-center">Sphère avec densités de Perlin.</p>
+            </div>
+        </div>  
+        <div class="row">
+            <div class="col">
+            <img
+            src="images/HG-065.png"
+            class="img-fluid"
+            alt="Scène 5"
+            />
+            <p class="text-center">Grille avec g = -0.65.</p>
+            </div>
+            <div class="col">
+            <img
+            src="images/scattering.png"
+            class="img-fluid"
+            alt="Scène 6"
+            />
+            <p class="text-center">Diffusion.</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Références -->
+    <div class="container my-5">
+        <h1 class="mb-4">Bibliographie</h1>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">1. Blinn, James F. (1977). <em>Models of light reflection for computer synthesized pictures</em>.</div>
+            <div class="bib-authors">Journal Article</div>
+            <div class="bib-info">
+              <p><strong>Reference:</strong> SIGGRAPH Comput. Graph., vol. 11, no. 2, pp. 192–198, July 1977.</p>
+              <p><strong>DOI:</strong> <a href="https://doi.org/10.1145/965141.563893">10.1145/965141.563893</a></p>
+              <p><strong>Abstract:</strong> In the production of computer generated pictures of three dimensional objects, one stage ... [omitted for brevity].</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">2. Blinn, James F. (1977). <em>Models of light reflection for computer synthesized pictures</em>.</div>
+            <div class="bib-authors">Conference Proceeding</div>
+            <div class="bib-info">
+              <p><strong>Reference:</strong> Proceedings of the 4th Annual Conference on Computer Graphics and Interactive Techniques (SIGGRAPH '77), ACM, New York, NY, USA, pp. 192–198.</p>
+              <p><strong>DOI:</strong> <a href="https://doi.org/10.1145/563858.563893">10.1145/563858.563893</a></p>
+              <p><strong>Abstract:</strong> In the production of computer generated pictures of three dimensional objects, one stage ... [omitted for brevity].</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">3. Shirley, Peter; Black, Trevor David; Hollasch, Steve (2024). <em>Ray Tracing in One Weekend</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html">
+                https://raytracing.github.io/books/RayTracingInOneWeekend.html</a></p>
+              <p><strong>Note:</strong> [Accessed August 2024]</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">4. Wikipedia contributors (2024). <em>Ray tracing (graphics)</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://en.wikipedia.org/w/index.php?title=Ray_tracing_(graphics)&oldid=1253778958">
+                https://en.wikipedia.org/w/index.php?title=Ray_tracing_(graphics)&oldid=1253778958</a></p>
+              <p><strong>Note:</strong> [Online; accessed 3-December-2024]</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">5. Josh's Channel (2022). <em>How Ray Tracing (Modern CGI) Works And How To Do It 600x Faster</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://www.youtube.com/watch?v=gsZiJeaMO48">
+                https://www.youtube.com/watch?v=gsZiJeaMO48</a></p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">6. Lague, Sebastian (2023). <em>Coding Adventure: Ray Tracing</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://www.youtube.com/watch?v=Qz0KTGYJtUk">
+                https://www.youtube.com/watch?v=Qz0KTGYJtUk</a></p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">7. Wikipedia contributors (2024). <em>Perlin noise</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://en.wikipedia.org/w/index.php?title=Perlin_noise&oldid=1258165795">
+                https://en.wikipedia.org/w/index.php?title=Perlin_noise&oldid=1258165795</a></p>
+              <p><strong>Note:</strong> [Online; accessed 3-December-2024]</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">8. Wikipedia contributors (2024). <em>Voxel</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://en.wikipedia.org/w/index.php?title=Voxel&oldid=1260713506">
+                https://en.wikipedia.org/w/index.php?title=Voxel&oldid=1260713506</a></p>
+              <p><strong>Note:</strong> [Online; accessed 3-December-2024]</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">9. Wikipedia contributors (2024). <em>Digital differential analyzer (graphics algorithm)</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://en.wikipedia.org/w/index.php?title=Digital_differential_analyzer_(graphics_algorithm)&oldid=1236307484">
+                https://en.wikipedia.org/w/index.php?title=Digital_differential_analyzer_(graphics_algorithm)&oldid=1236307484</a></p>
+              <p><strong>Note:</strong> [Online; accessed 3-December-2024]</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">10. Amanatides, John; Woo, Andrew (1987). <em>A Fast Voxel Traversal Algorithm for Ray Tracing</em>.</div>
+            <div class="bib-authors">Article</div>
+            <div class="bib-info">
+              <p><strong>Reference:</strong> Proceedings of EuroGraphics, vol. 87, August 1987.</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">11. Gyurgyik, C.; Kellison, A. (2022). <em>An Overview of the Fast Voxel Traversal Algorithm</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://github.com/cgyurgyik/fast-voxel-traversal-algorithm/blob/master/overview/FastVoxelTraversalOverview.md">
+                https://github.com/cgyurgyik/fast-voxel-traversal-algorithm/blob/master/overview/FastVoxelTraversalOverview.md</a></p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">12. Scratchapixel (2024). <em>Volume Rendering</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/volume-rendering-for-developers/intro-volume-rendering.html">
+                https://www.scratchapixel.com/lessons/3d-basic-rendering/volume-rendering-for-developers/intro-volume-rendering.html</a></p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">13. Wikipedia contributors (2024). <em>Beer–Lambert law</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://en.wikipedia.org/w/index.php?title=Beer%E2%80%93Lambert_law&oldid=1262471473">
+                https://en.wikipedia.org/w/index.php?title=Beer%E2%80%93Lambert_law&oldid=1262471473</a></p>
+              <p><strong>Note:</strong> [Online; accessed 12-December-2024]</p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="row bib-entry">
+          <div class="col">
+            <div class="bib-title">14. Lague, Sebastian (2024). <em>Coding Adventure: Rendering Fluids</em>.</div>
+            <div class="bib-authors">Miscellaneous</div>
+            <div class="bib-info">
+              <p><strong>URL:</strong> <a href="https://youtu.be/kOkfC5fLfgE?si=aP0OiqEs7PTszgTI">
+                https://youtu.be/kOkfC5fLfgE?si=aP0OiqEs7PTszgTI</a></p>
+            </div>
+          </div>
+        </div>
+    </div>
+
+</div> <!-- Fin du conteneur principal -->
+
+<!-- Scripts Bootstrap -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+></script>
+
+</body>
+</html>

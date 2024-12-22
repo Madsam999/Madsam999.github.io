@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IFT3150: Cours Projet</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body > 
     <div class="jumbotron">
@@ -83,8 +84,26 @@
                 <li class="list-group-item">
                     Implémentation de l'accumulation de densité le long du rayon (fonctionalité à travailler).
                 </li>
+                <li class="list-group-item">
+                    Implémentation complète de l'accumulation de densité le long du rayon.
+                </li>
+                <li class="list-group-item">
+                    Implémentation de l'interpolation trilinéaire pour obtenir la densité dans un voxel (au lieu qu'elle soit uniformément distribuée dans le voxel).
+                </li>
+                <li class="list-group-item">
+                    Implémentation du second algorithme de parcours de la grille, le Ray Marching ainsi que toutes les variantes nécessaires au projet.
+                </li>
+                <li class="list-group-item">
+                    Implémentation de la fonction de phase de de Henyey-Greenstein.
+                </li>
+                <li class="list-group-item">
+                    Écriture du rapport final du projet.
+                </li>
+                <li class="list-group-item">
+                    Génération de plusieurs images de volumes participatifs.
+                </li>
             </ul>
-            <p class="lead card-text">Dernière mise à jour: 7 octobre 2024 à 1:56 am.</p>
+            <p class="lead card-text">Dernière mise à jour: 22 décemembre 2024 à 4:28 pm.</p>
         </div>
     </div>
     <div class="card border-dark mb-3 w-75 mx-auto">
@@ -93,13 +112,7 @@
             <p class="lead card-text">Liste de ce qui s'en vient!</p>
             <ul class="list-group">
                 <li class="list-group-item"> 
-                    Paufinement des fonctions d'accumulation de densité le long du rayon.
-                </li>
-                <li class="list-group-item">
-                    Implémentation de l'interpolation trilinéaire pour obtenir la densité dans un voxel (au lieu qu'elle soit uniformément distribué dans le voxel).
-                </li>
-                <li class="list-group-item">
-                    Implémentation du second algorithme de parcours de la grille, le Ray Marching ainsi que toutes les variantes nécessaires au projet.
+                    Remettre le projet final et profiter du temps des fêtes!
                 </li>
             </ul>
         </div>
@@ -125,6 +138,29 @@
                         Repo Github de la page web!
                     </a>
                 </li>                          
+            </ul>
+        </div>
+    </div>
+    <div class="card border-dark mb-3 w-75 mx-auto">
+        <div class="card-body">
+            <h2 class="mt-5 card-title">Liens aux rapports</h2>
+            <p class="lead card-text">Liens aux diiférents rapports:</p>
+            <ul class="list-group">
+                <li class="list-group-item"> 
+                    <a href="resume_en.html">
+                        Summary of the final report.
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="rapport_final.pdf">
+                        Résumé du rapport final.
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="Rapport_final-1.pdf">
+                        Rapport final complet.
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
@@ -156,10 +192,63 @@
                         Scratchapixel, Volume Rendering Based on 3D Voxel Grid, 2021
                     </a>
                 </li>
+                <li class="list-group-item">
+                    <a href="https://doi.org/10.1145/965141.563893">
+                        Models of light reflection for computer synthesized pictures
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html">
+                        Ray Tracing in One Weekend par Peter Shirley, Trevor David Black et Steve Hollasch
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="https://en.wikipedia.org/w/index.php?title=Perlin_noise&oldid=1258165795">
+                        Perlin noise, Wikipedia
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="https://en.wikipedia.org/w/index.php?title=Voxel&oldid=1260713506">
+                        Voxel, Wikipedia
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="https://en.wikipedia.org/w/index.php?title=Digital_differential_analyzer_(graphics_algorithm)&oldid=1236307484">
+                        Digital differential analyzer (graphics algorithm), Wikipedia
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="https://en.wikipedia.org/w/index.php?title=Beer%E2%80%93Lambert_law&oldid=1262471473">
+                        Beer–Lambert law, Wikipedia
+                    </a>
             </ul>
-            <p class="lead card-text">Dernière mise à jour: 7 octobre 2024 à 1:56 am.</p>
+            <p class="lead card-text">Dernière mise à jour: 22 décembre 2024 à 4:37 pm.</p>
         </div>
     </div>
+    <div class="card border-dark mb-3 w-75 mx-auto">
+        <div class="card-body">
+            <h2 class="mt-5 card-title">Ressources additionnelles liées au projet!</h2>
+            <p class="lead card-text">Liens aux ressources additionnelles:</p>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <a href="https://youtu.be/kOkfC5fLfgE?si=aP0OiqEs7PTszgTI">
+                        <i style="font-size:24px" class="fa">&#xf16a;</i>
+                        Coding Adventure: Rendering Fluids, Sebastian Lague
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href=https://www.youtube.com/watch?v=Qz0KTGYJtUk">
+                        <i style="font-size:24px" class="fa">&#xf16a;</i>
+                        Coding Adventure: Ray Tracing, Sebastian Lague
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="https://www.youtube.com/watch?v=gsZiJeaMO48">
+                        <i style="font-size:24px" class="fa">&#xf16a;</i>
+                        How Ray Tracing (Modern CGI) Works And How To Do It 600x Faster, Josh's Channel
+                    </a>
+                </li>
+            </ul>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
